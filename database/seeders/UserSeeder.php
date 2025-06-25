@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -53,9 +53,9 @@ class UserSeeder extends Seeder
         ]);
         $user->assignRole('user');
 
-        // Create additional test users
-        User::factory(10)->create()->each(function ($user) {
-            $user->assignRole('user');
-        });
+        // Additional test users can be created with factories later
+        // User::factory(10)->create()->each(function ($user) {
+        //     $user->assignRole('user');
+        // });
     }
 }

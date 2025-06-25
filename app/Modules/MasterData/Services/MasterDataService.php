@@ -53,7 +53,7 @@ class MasterDataService
             unset($data['permissions']);
 
             // Set default guard name
-            $data['guard_name'] = $data['guard_name'] ?? 'web';
+            $data['guard_name'] = $data['guard_name'] ?? 'api';
 
             // Create role
             $role = Role::create($data);

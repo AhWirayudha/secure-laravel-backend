@@ -13,6 +13,46 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// Test route to verify basic functionality
+Route::get('/test', function () {
+    return response()->json(['message' => 'PKTracker API is working!']);
+});
+
+// Test authenticated route
+Route::middleware(['auth:api'])->get('/test-auth', function () {
+    return response()->json([
+        'message' => 'Authentication working!',
+        'user' => auth()->user(),
+        'guard' => auth()->guard()->name ?? 'unknown'
+    ]);
+});
+
+// Test role creation route for debugging
+Route::middleware(['auth:api'])->post('/test-role', function (Illuminate\Http\Request $request) {
+    try {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        
+        $role = \Spatie\Permission\Models\Role::create([
+            'name' => $request->name,
+            'guard_name' => 'api'
+        ]);
+        
+        return response()->json([
+            'message' => 'Role created successfully',
+            'role' => $role
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Health check routes
 Route::get('/health', [HealthCheckController::class, 'index'])->name('api.health');
 Route::get('/health/detailed', [HealthCheckController::class, 'detailed'])->name('api.health.detailed');
@@ -23,16 +63,14 @@ Route::prefix('v1')->group(function () {
     // Authentication routes (public)
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register'])
-            ->middleware(['rate_limit:auth,5,1'])
             ->name('api.auth.register');
             
         Route::post('/login', [AuthController::class, 'login'])
-            ->middleware(['rate_limit:auth,5,1'])
             ->name('api.auth.login');
     });
 
     // Protected routes
-    Route::middleware(['auth:api', 'rate_limit:api,100,1'])->group(function () {
+    Route::middleware(['auth:api'])->group(function () {
         
         // Authentication routes (protected)
         Route::prefix('auth')->group(function () {

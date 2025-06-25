@@ -51,14 +51,14 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::create(['name' => $permission, 'guard_name' => 'api']);
         }
 
         // Create roles and assign permissions
-        $superAdminRole = Role::create(['name' => 'super-admin']);
+        $superAdminRole = Role::create(['name' => 'super-admin', 'guard_name' => 'api']);
         $superAdminRole->givePermissionTo(Permission::all());
 
-        $adminRole = Role::create(['name' => 'admin']);
+        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'api']);
         $adminRole->givePermissionTo([
             'view-users', 'create-users', 'edit-users',
             'view-roles', 'create-roles', 'edit-roles',
@@ -67,7 +67,7 @@ class RoleAndPermissionSeeder extends Seeder
             'access-api', 'admin-api',
         ]);
 
-        $moderatorRole = Role::create(['name' => 'moderator']);
+        $moderatorRole = Role::create(['name' => 'moderator', 'guard_name' => 'api']);
         $moderatorRole->givePermissionTo([
             'view-users', 'edit-users',
             'view-roles',
@@ -75,7 +75,7 @@ class RoleAndPermissionSeeder extends Seeder
             'access-api',
         ]);
 
-        $userRole = Role::create(['name' => 'user']);
+        $userRole = Role::create(['name' => 'user', 'guard_name' => 'api']);
         $userRole->givePermissionTo([
             'access-api',
         ]);
