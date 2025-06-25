@@ -5,7 +5,7 @@ namespace App\Modules\Auth\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Requests\LoginRequest;
 use App\Modules\Auth\Requests\RegisterRequest;
-use App\Models\User;
+use App\Modules\User\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,7 +95,11 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (!Auth::attempt($credentials)) {
+        // Find user by email
+        $user = User::where('email', $credentials['email'])->first();
+
+        // Check if user exists and password is correct
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             RateLimiter::hit($rateLimitKey, 300); // 5 minutes
             
             Log::warning('Failed login attempt', [
@@ -110,13 +114,19 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Check if user is active
+        if (!$user->is_active) {
+            return response()->json([
+                'error' => 'Account disabled',
+                'message' => 'Your account has been disabled'
+            ], 403);
+        }
+
         RateLimiter::clear($rateLimitKey);
 
-        $user = Auth::user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        $token->expires_at = now()->addDays(config('auth.token_lifetime', 30));
-        $token->save();
+        // Create Passport token
+        $tokenResult = $user->createToken('PKTracker API Token');
+        $token = $tokenResult->accessToken;
 
         Log::info('User logged in successfully', [
             'user_id' => $user->id,
@@ -134,9 +144,8 @@ class AuthController extends Controller
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
             ],
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => $token->expires_at->toDateTimeString()
+            'access_token' => $token,
+            'token_type' => 'Bearer'
         ]);
     }
 

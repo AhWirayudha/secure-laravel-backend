@@ -16,6 +16,13 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     /**
+     * The guard name for Spatie Permission.
+     *
+     * @var string
+     */
+    protected $guard_name = 'api';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

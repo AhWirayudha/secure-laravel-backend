@@ -174,7 +174,7 @@ return [
          */
         Laravel\Passport\PassportServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
-        Laravel\Telescope\TelescopeServiceProvider::class,
+        // Laravel\Telescope\TelescopeServiceProvider::class, // Disabled for testing
 
         /*
          * Application Service Providers...

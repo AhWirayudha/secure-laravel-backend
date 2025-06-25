@@ -40,7 +40,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            // Using Passport for authentication, so no need for Sanctum middleware
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ApiVersionMiddleware::class.':v1',
@@ -73,8 +73,5 @@ class Kernel extends HttpKernel
         'security_headers' => \App\Http\Middleware\SecurityHeaders::class,
         'api_version' => \App\Http\Middleware\ApiVersionMiddleware::class,
         'api_logging' => \App\Http\Middleware\ApiLoggingMiddleware::class,
-        'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
-        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
     ];
 }
