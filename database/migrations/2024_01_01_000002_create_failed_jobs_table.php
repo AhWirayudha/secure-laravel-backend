@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->text('connection');
-            $table->text('queue');
+            $table->string('queue', 191); // Changed from text to string with max length 191
             $table->longText('payload');
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
